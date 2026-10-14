@@ -23,7 +23,7 @@ class ProjetInterneController extends Controller
     protected $utilService;
     protected $project;
 
-    public function __construct(UtilService $utilService,ProjetService $prj)
+    public function __construct(UtilService $utilService, ProjetService $prj)
     {
         $this->utilService = $utilService;
         $this->project = $prj;
@@ -109,12 +109,12 @@ class ProjetInterneController extends Controller
         return response()->json([
             'status' => 200,
             'projet_counts' => [
-                'terminer' => $terminer, 
-                'annuler' => $annuler, 
-                'preparation' => $preparation, 
-                'cloturer' => $cloturer, 
-                'encours' => $encours, 
-                'reporter' => $reporter, 
+                'terminer' => $terminer,
+                'annuler' => $annuler,
+                'preparation' => $preparation,
+                'cloturer' => $cloturer,
+                'encours' => $encours,
+                'reporter' => $reporter,
                 'planifier' => $planifier
             ]
         ]);
@@ -156,7 +156,7 @@ class ProjetInterneController extends Controller
                 ->get();
 
             $projetCount = count($projets);
-        } else {  
+        } else {
             $projects = $this->getUnionProject()->get();
             $projets = $this->getProjets($projects);
 
@@ -197,7 +197,7 @@ class ProjetInterneController extends Controller
     public function getProjectListByStatus(Request $request)
     {
         // Récupérer le status depuis la query string, ex: ?status=En cours
-        $status = $request->query('status', 'Terminé');  
+        $status = $request->query('status', 'Terminé');
 
         $etp_id = Customer::idCustomer();
         $projets = [];
@@ -237,7 +237,7 @@ class ProjetInterneController extends Controller
                 $query->where('project_type', 'Interne')
                     ->orWhere(function ($query) {
                         $query->whereIn('project_type', ['Intra', 'Inter'])
-                                ->whereIn('project_status', ['En cours', 'Terminé', 'Planifié', 'Annulé', 'Cloturé']);
+                            ->whereIn('project_status', ['En cours', 'Terminé', 'Planifié', 'Annulé', 'Cloturé']);
                     });
             })
             ->get();
@@ -311,11 +311,11 @@ class ProjetInterneController extends Controller
             ->select('idProjet', 'idEtp_inter', 'idCfp_intra', 'idCfp_inter', 'dateDebut', 'dateFin', 'paiement', 'project_title', 'etp_name', 'ville', 'project_status', 'project_description',  'project_type', 'project_reference', 'idModalite', 'modalite', 'idEtp', 'etp_initial_name', 'etp_logo', 'idModule', 'module_name', 'module_image', 'module_description', 'salle_name', 'salle_rue', 'salle_quartier', 'salle_code_postal', 'ville', 'total_ht', 'total_ttc', 'total_ht_etp')
             ->where('idProjet', $idProjet);
 
-        if($projet->exists()){
+        if ($projet->exists()) {
             $cfp = DB::table('customers')
-            ->select('customerName AS cfp_name', 'logo AS cfp_logo', 'customerEmail AS cfp_email')
-            ->whereIn('idCustomer', [$projet->first()->idCfp_inter, $projet->first()->idCfp_intra])
-            ->first();
+                ->select('customerName AS cfp_name', 'logo AS cfp_logo', 'customerEmail AS cfp_email')
+                ->whereIn('idCustomer', [$projet->first()->idCfp_inter, $projet->first()->idCfp_intra])
+                ->first();
 
             $apprenantInter = DB::table('v_list_apprenant_inter_added')
                 ->select('*')
@@ -491,7 +491,7 @@ class ProjetInterneController extends Controller
                     'cfp' => $cfp
                 ]
             ]);
-        }else{
+        } else {
             return response()->json([
                 'status' => 204,
                 'message' => 'Projet introuvable !'
@@ -502,10 +502,10 @@ class ProjetInterneController extends Controller
     public function getMiniCV($idFormateur)
     {
         $form = DB::table('users')
-                ->select('id', 'name', 'email', 'firstName', 'phone', 'photo')
-                ->where('id', $idFormateur);
+            ->select('id', 'name', 'email', 'firstName', 'phone', 'photo')
+            ->where('id', $idFormateur);
 
-        if($form->exists()){
+        if ($form->exists()) {
             // Expériences
             $exp = DB::table('experiences')
                 ->select('id', 'idFormateur', 'Lieu_de_stage', 'Fonction', 'Date_debut', 'Date_fin', 'Lieu')
@@ -540,7 +540,7 @@ class ProjetInterneController extends Controller
                     'langues' => $lg
                 ]
             ]);
-        }else{
+        } else {
             return response()->json([
                 'status' => 204,
                 'message' => 'Introuvable !'
@@ -548,7 +548,8 @@ class ProjetInterneController extends Controller
         }
     }
 
-    public function formAssign($idProjet, $idFormateur){
+    public function formAssign($idProjet, $idFormateur)
+    {
         $check = DB::table('project_forms')
             ->select('idProjet', 'idFormateur')
             ->where('idProjet', $idProjet)
@@ -579,7 +580,7 @@ class ProjetInterneController extends Controller
             ->where('idProjet', $idProjet)
             ->get();
 
-        if(count($forms) <= 0){
+        if (count($forms) <= 0) {
             return response()->json([
                 'status' => 204,
                 'message' => 'AUcun résultat !'
@@ -600,7 +601,7 @@ class ProjetInterneController extends Controller
             ->where('idProjet', $idProjet)
             ->get();
 
-        if(count($forms) <= 0){
+        if (count($forms) <= 0) {
             return response()->json([
                 'forms' => [],
                 'message' => 'AUcun résultat !'
@@ -616,15 +617,15 @@ class ProjetInterneController extends Controller
     public function formRemove($idProjet, $idFormateur)
     {
         $query = DB::table('project_forms')->where('idFormateur', $idFormateur)->where('idProjet', $idProjet);
-        
-        if($query->exists()){
+
+        if ($query->exists()) {
             $query->delete();
 
             return response()->json([
                 'status' => 200,
                 'message' => 'Succès'
             ]);
-        }else{
+        } else {
             return response()->json([
                 'status' => 204,
                 'message' => 'AUcun résultat !'
@@ -636,12 +637,12 @@ class ProjetInterneController extends Controller
     {
         $etp = DB::table('v_union_projets')->select('idProjet', 'idEtp', 'etp_initial_name', 'etp_name', 'etp_logo')->where('idProjet', $idProjet);
 
-        if($etp->exists()){
+        if ($etp->exists()) {
             return response()->json([
                 'status' => 200,
                 'entreprise' => $etp->first()
             ]);
-        }else{
+        } else {
             return response()->json([
                 'status' => 204,
                 'message' => 'AUcun résultat !'
@@ -742,15 +743,15 @@ class ProjetInterneController extends Controller
     public function moduleAssign($idProjet, $idModule)
     {
         $query = DB::table('projets')->where('idCustomer', Customer::idCustomer())->where('idProjet', $idProjet);
-        
-        if($query->exists()){
+
+        if ($query->exists()) {
             $query->update(['idModule' => $idModule]);
 
             return response()->json([
                 'status' => 200,
                 'message' => 'Succès'
             ]);
-        }else{
+        } else {
             return response()->json([
                 'status' => 204,
                 'message' => 'AUcun résultat !'
@@ -762,12 +763,12 @@ class ProjetInterneController extends Controller
     {
         $mdl = DB::table('v_union_projets')->select('idProjet', 'idModule', 'module_name', 'module_description', 'module_image')->where('idProjet', $idProjet);
 
-        if($mdl->exists()){
+        if ($mdl->exists()) {
             return response()->json([
                 'status' => 200,
                 'module' => $mdl->first()
             ]);
-        }else{
+        } else {
             return response()->json([
                 'status' => 204,
                 'message' => 'Aucun résultat !'
@@ -783,8 +784,8 @@ class ProjetInterneController extends Controller
         ]);
 
         $query = DB::table('projets')->where('idCustomer', Customer::idCustomer())->where('idProjet', $idProjet);
-        
-        if($query->exists()){
+
+        if ($query->exists()) {
             $query->update([
                 'dateDebut' => $req->dateDebut,
                 'dateFin' => $req->dateFin,
@@ -795,7 +796,7 @@ class ProjetInterneController extends Controller
                 'status' => 200,
                 'message' => 'Succès'
             ]);
-        }else{
+        } else {
             return response()->json([
                 'status' => 204,
                 'message' => 'AUcun résultat !'
@@ -803,7 +804,8 @@ class ProjetInterneController extends Controller
         }
     }
 
-    public function destroy($idProjet){
+    public function destroy($idProjet)
+    {
         $typeProjet = DB::table('projets')->select('idTypeProjet')->where('idProjet', $idProjet)->first();
         $interEtp = DB::table('inter_entreprises')->where('idProjet', $idProjet)->get();
         $apprs = DB::table('detail_apprenants')->where('idProjet', $idProjet)->get();
@@ -844,7 +846,7 @@ class ProjetInterneController extends Controller
     {
         $programmes = DB::table('programmes')->select('idProgramme', 'program_title', 'program_description', 'idModule')->where('idModule', $idModule)->get();
 
-        if(count($programmes) <= 0){
+        if (count($programmes) <= 0) {
             return response()->json([
                 'status' => 204,
                 'message' => 'AUcun résultat !'
@@ -864,7 +866,7 @@ class ProjetInterneController extends Controller
             ->where('idModule', $idModule)
             ->get();
 
-        if(count($module_ressources) <= 0){
+        if (count($module_ressources) <= 0) {
             return response()->json([
                 'status' => 204,
                 'message' => 'AUcun résultat !'
@@ -936,7 +938,7 @@ class ProjetInterneController extends Controller
     public function updateDate(Request $req, $idProjet)
     {
         $query = $this->project->getProject(Customer::idCustomer())->where('idProjet', $idProjet);
-        
+
         if ($req->dateDebut) {
             $validate = Validator::make($req->all(), [
                 'dateDebut' => 'required|date'
@@ -945,7 +947,7 @@ class ProjetInterneController extends Controller
             if ($validate->fails()) {
                 return response()->json(['error' => $validate->messages()]);
             } else {
-                if($query->exists()){
+                if ($query->exists()) {
                     $query->update([
                         'dateDebut' => $req->dateDebut
                     ]);
@@ -954,7 +956,7 @@ class ProjetInterneController extends Controller
                         'status' => 200,
                         'message' => 'Succès'
                     ]);
-                }else{
+                } else {
                     return response()->json([
                         'status' => 204,
                         'message' => 'Introuvable !'
@@ -969,7 +971,7 @@ class ProjetInterneController extends Controller
             if ($validate->fails()) {
                 return response()->json(['error' => $validate->messages()]);
             } else {
-                if($query->exists()){
+                if ($query->exists()) {
                     $query->update([
                         'dateFin' => $req->dateFin
                     ]);
@@ -978,7 +980,7 @@ class ProjetInterneController extends Controller
                         'status' => 200,
                         'message' => 'Succès'
                     ]);
-                }else{
+                } else {
                     return response()->json([
                         'status' => 204,
                         'message' => 'Introuvable !'
@@ -993,10 +995,10 @@ class ProjetInterneController extends Controller
         $req->validate([
             'idModule' => 'required|exists:mdls,idModule'
         ]);
-    
+
         $query = $this->project->getProject(Customer::idCustomer())->where('idProjet', $idProjet);
 
-        if($query->exists()){
+        if ($query->exists()) {
             $query->update([
                 'idModule' => $req->idModule
             ]);
@@ -1005,7 +1007,7 @@ class ProjetInterneController extends Controller
                 'status' => 200,
                 'message' => 'Succès'
             ]);
-        }else{
+        } else {
             return response()->json([
                 'status' => 204,
                 'message' => 'Introuvable !'
@@ -1017,7 +1019,7 @@ class ProjetInterneController extends Controller
     {
         $query = $this->project->getProject(Customer::idCustomer())->where('idProjet', $idProjet);
 
-        if($query->exists()){
+        if ($query->exists()) {
             $query->update([
                 'idSalle' => $idSalle
             ]);
@@ -1026,7 +1028,7 @@ class ProjetInterneController extends Controller
                 'status' => 200,
                 'message' => 'Succès'
             ]);
-        }else{
+        } else {
             return response()->json([
                 'status' => 204,
                 'message' => 'Introuvable !'
@@ -1037,18 +1039,18 @@ class ProjetInterneController extends Controller
     public function getSalleAdded($idProjet)
     {
         $salle = DB::table('v_union_projets')
-            ->select( 'salle_name', 'salle_rue', 'salle_quartier', 'ville', 'salle_code_postal')
+            ->select('salle_name', 'salle_rue', 'salle_quartier', 'ville', 'salle_code_postal')
             ->where(function ($query) use ($idProjet) {
                 $query->where('idProjet', $idProjet)
                     ->where('salle_name', '!=', 'null');
             });
 
-        if($salle->exists()){
+        if ($salle->exists()) {
             return response()->json([
                 'status' => 200,
                 'salle' => $salle->first()
             ]);
-        }else{
+        } else {
             return response()->json([
                 'status' => 204,
                 'message' => 'Aucun résultat !'
@@ -1060,7 +1062,7 @@ class ProjetInterneController extends Controller
     {
         $query = $this->project->getProject(Customer::idCustomer())->where('idProjet', $idProjet);
 
-        if($query->exists()){
+        if ($query->exists()) {
             $query->update([
                 'project_is_active' => 0,
                 'project_is_reserved' => 0,
@@ -1073,7 +1075,7 @@ class ProjetInterneController extends Controller
                 'status' => 200,
                 'message' => 'Succès'
             ]);
-        }else{
+        } else {
             return response()->json([
                 'status' => 204,
                 'message' => 'Introuvable !'
@@ -1090,7 +1092,7 @@ class ProjetInterneController extends Controller
 
         $query = $this->project->getProject(Customer::idCustomer())->where('idProjet', $idProjet);
 
-        if($query->exists()){
+        if ($query->exists()) {
             $query->update([
                 'dateDebut' => $req->dateDebut,
                 'dateFin' => $req->dateFin,
@@ -1105,7 +1107,7 @@ class ProjetInterneController extends Controller
                 'status' => 200,
                 'message' => 'Succès'
             ]);
-        }else{
+        } else {
             return response()->json([
                 'status' => 204,
                 'message' => 'Introuvable !'
@@ -1117,7 +1119,7 @@ class ProjetInterneController extends Controller
     {
         $query = $this->project->getProject(Customer::idCustomer())->where('idProjet', $idProjet);
 
-        if($query->exists()){
+        if ($query->exists()) {
             $query->update([
                 'project_is_active' => 1,
                 'project_is_reserved' => 0,
@@ -1130,7 +1132,7 @@ class ProjetInterneController extends Controller
                 'status' => 200,
                 'message' => 'Succès'
             ]);
-        }else{
+        } else {
             return response()->json([
                 'status' => 204,
                 'message' => 'Introuvable !'
@@ -1148,7 +1150,7 @@ class ProjetInterneController extends Controller
 
         $query = $this->project->getProject(Customer::idCustomer())->where('idProjet', $idProjet);
 
-        if($query->exists()){
+        if ($query->exists()) {
             $query->update([
                 'project_reference' => $req->project_reference,
                 'project_title' => $req->project_title,
@@ -1159,7 +1161,7 @@ class ProjetInterneController extends Controller
                 'status' => 200,
                 'message' => 'Succès'
             ]);
-        }else{
+        } else {
             return response()->json([
                 'status' => 204,
                 'message' => 'Projet Introuvable !'
@@ -1483,9 +1485,9 @@ class ProjetInterneController extends Controller
         if ($searchTerm !== '') {
             $like = '%' . mb_strtolower($searchTerm, 'UTF-8') . '%';
 
-            $query->where(function($q) use ($like) {
+            $query->where(function ($q) use ($like) {
                 $q->whereRaw('LOWER(project_reference) LIKE ?', [$like])
-                ->orWhereRaw('LOWER(module_name) LIKE ?', [$like]);
+                    ->orWhereRaw('LOWER(module_name) LIKE ?', [$like]);
             });
         }
 
@@ -3557,7 +3559,7 @@ class ProjetInterneController extends Controller
             ]);
         }
     }
-    
+
     public function filterItem(Request $req)
     {
         $idStatus = explode(',', $req->idStatut);
@@ -3622,18 +3624,18 @@ class ProjetInterneController extends Controller
                 // ->where('headYear', Carbon::now()->format('Y'))
                 ->orderBy('dateDebut', 'asc');
 
-                  // Initialiser $queryDate pour le cas non groupé
-                    $queryDate = DB::table('v_union_projets')
-                        ->select('headDate', 'headMonthDebut')
-                        ->groupBy('headDate', 'headMonthDebut')
-                        ->orderBy('dateDebut', 'asc')
-                        ->where(function ($query) {
-                            $query->where('idEtp', Customer::idCustomer())
-                                ->orWhereIn(
-                                    'idCfp_inter',
-                                    $this->getIdEtpCfps()
-                                );
-                        });
+            // Initialiser $queryDate pour le cas non groupé
+            $queryDate = DB::table('v_union_projets')
+                ->select('headDate', 'headMonthDebut')
+                ->groupBy('headDate', 'headMonthDebut')
+                ->orderBy('dateDebut', 'asc')
+                ->where(function ($query) {
+                    $query->where('idEtp', Customer::idCustomer())
+                        ->orWhereIn(
+                            'idCfp_inter',
+                            $this->getIdEtpCfps()
+                        );
+                });
         }
 
         /**CLIC BOUTONS STATUS...(ETP Grouped ex:TELMA) */
@@ -3642,16 +3644,16 @@ class ProjetInterneController extends Controller
         if ($searchTerm !== '') {
             $like = '%' . mb_strtolower($searchTerm, 'UTF-8') . '%';
 
-            $query->where(function($q) use ($like) {
+            $query->where(function ($q) use ($like) {
                 $q->whereRaw('LOWER(project_reference) LIKE ?', [$like])
-                ->orWhereRaw('LOWER(module_name) LIKE ?', [$like]);
+                    ->orWhereRaw('LOWER(module_name) LIKE ?', [$like]);
             });
 
-              // Vérifier si $queryDate existe avant de l'utiliser
+            // Vérifier si $queryDate existe avant de l'utiliser
             if ($queryDate) {
-                $queryDate->where(function($q) use ($like) {
+                $queryDate->where(function ($q) use ($like) {
                     $q->whereRaw('LOWER(project_reference) LIKE ?', [$like])
-                    ->orWhereRaw('LOWER(module_name) LIKE ?', [$like]);
+                        ->orWhereRaw('LOWER(module_name) LIKE ?', [$like]);
                 });
             }
         }
@@ -4733,19 +4735,18 @@ class ProjetInterneController extends Controller
             ->where('idProjet', $idProjet)
             ->where('idTypeImage', 1);
 
-        if(count($images->get()) <= 0){
+        if (count($images->get()) <= 0) {
             return response()->json([
                 'status' => 204,
                 'message' => 'Aucun résultat !'
             ], 204);
-        }else{    
+        } else {
             return response()->json([
                 'status' => 200,
                 'images' => $images->paginate(8),
                 'idProjet' => $request->idProjet
             ]);
         }
-        
     }
 
 
@@ -4764,7 +4765,7 @@ class ProjetInterneController extends Controller
         return $forms->toArray();
     }
 
-     public function getNote($idProjet)
+    public function getNote($idProjet)
     {
         $checkEvaluation = DB::table('eval_chauds')->select('idProjet')->get();
         $checkEvaluationCount = count($checkEvaluation);
@@ -5324,18 +5325,18 @@ class ProjetInterneController extends Controller
     }
 
     // private function get
-    
+
     public function getInvoiceProject($idProjet)
     {
-       $invoice = DB::table('invoice_details')
+        $invoice = DB::table('invoice_details')
             ->join('invoices', 'invoices.idInvoice', '=', 'invoice_details.idInvoice')
             ->join('invoice_status', 'invoice_status.idInvoiceStatus', '=', 'invoices.invoice_status')
-            ->select('invoice_status.invoice_status_name') 
+            ->select('invoice_status.invoice_status_name')
             ->where('invoice_details.idProjet', $idProjet)
             ->get();
 
 
-       return $invoice;
+        return $invoice;
     }
 
     public function getNomDossier($idProjet)
@@ -5390,6 +5391,7 @@ class ProjetInterneController extends Controller
                 'logoCfp' => ($project->idTypeprojet == 1) ? $this->getLogoCfpIntra($project->idCfp_intra) : null,
                 'logoCfpInter' => ($project->idTypeprojet == 2) ? $this->getLogoCfpIntra($project->idCfp_inter) : null,
                 'nameCfp' => ($project->idTypeprojet == 1) ? $this->getNameCfpIntra($project->idCfp_intra) : null,
+                'nameCfpInter' => ($project->idTypeprojet == 2) ? $this->getNameCfpIntra($project->idCfp_inter) : null,
                 'initialnameCfp' => ($project->idTypeprojet == 1) ? $this->getInitialNameCfp($project->idCfp_intra) : null,
                 'initialnameCfpInter' => ($project->idTypeprojet == 2) ?  $this->getInitialNameCfp($project->idCfp_inter) : null,
                 'dateDebut' => $project->dateDebut,
@@ -5408,7 +5410,6 @@ class ProjetInterneController extends Controller
                 'salle_name' => $project->salle_name,
                 'salle_quartier' => $project->salle_quartier,
                 'salle_code_postal' => $project->salle_code_postal,
-                'ville' => $project->ville,
                 'etp_name_in_situ' => $project->etp_name,
                 'total_ht' => $this->utilService->formatPrice(($project->total_ht_etp != 0) ? $project->total_ht_etp : $project->total_ht),
                 'total_ttc' => $project->total_ttc,
@@ -5784,7 +5785,7 @@ class ProjetInterneController extends Controller
         }
     }
 
-    
+
 
     public function update(Request $req, $projectId, $projectName)
     {
@@ -6038,6 +6039,4 @@ class ProjetInterneController extends Controller
             ->toArray();
         return $restaurations;
     }
-
-
 }
