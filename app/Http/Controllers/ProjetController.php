@@ -7060,11 +7060,17 @@ class ProjetController extends Controller
             ]);
         } elseif ($projectType === 2) {
             $etpId = DB::table('employes')->select('idCustomer')->where('idEmploye', $employeeId)->first();
-            DB::table('detail_apprenant_inters')->insert([
-                'idProjet' => $projectId,
-                'idEmploye' => $employeeId,
-                'idEtp' => $etpId->idCustomer
-            ]);
+            DB::transaction(function () use ($projectId, $employeeId, $etpId) {
+                DB::table('apprenants')->insertOrIgnore([
+                    'idEmploye' => $employeeId
+                ]);
+
+                DB::table('detail_apprenant_inters')->insert([
+                    'idProjet' => $projectId,
+                    'idEmploye' => $employeeId,
+                    'idEtp' => $etpId->idCustomer
+                ]);
+            });
         } elseif ($projectType === 4) {
             DB::table('particulier_projet')->insert([
                 'idProjet' => $projectId,
