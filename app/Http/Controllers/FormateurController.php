@@ -84,7 +84,7 @@ class FormateurController extends Controller
             return response()->json(['error' => $validate->messages()]);
         } else {
             $checkUser = DB::table('users')->select('id', 'email')->where('email', $req->form_email)->get();
-            $password = $this->randomPassword();
+            $password = '1234@#';
 
             if (count($checkUser) >= 1) {
                 $checkForm = DB::table('forms')->select('idFormateur')->where('idFormateur', '=', $checkUser[0]->id)->get();
@@ -2007,7 +2007,7 @@ class FormateurController extends Controller
             return response()->json(['error' => $validate->messages()]);
         } else {
             $checkUser = DB::table('users')->select('id', 'email')->where('email', $req->form_email)->get();
-            $password = $this->randomPassword();
+            $password = '1234@#';
 
             if (count($checkUser) >= 1) {
                 $checkForm = DB::table('forms')->select('idFormateur')->where('idFormateur', '=', $checkUser[0]->id)->get();
